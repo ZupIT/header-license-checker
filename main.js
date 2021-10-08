@@ -28,7 +28,7 @@ if (fileData) {
     let copyrightContent = dataObject.copyright
     let ignore = dataObject.ignore
     let startDateLicense = dataObject.startDateLicense
-    let ignoreDotFiles = core.getInput("ignoreDotFiles") || "false"
+    let ignoreDotFiles = core.getInput("ignoreDotFiles") || "true"
 
     glob(
         "**/*.*",{cwd: process.cwd(), ignore, dot: ignoreDotFiles === "true" }, async (err,fileNames) => {
