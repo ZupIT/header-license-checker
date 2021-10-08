@@ -4,7 +4,7 @@ Inspired on [Deno License Checker]
 
 # Usage
 
-Create `config.json` like the following:
+Create a `config.json` like the following:
 
 ```
 "copyright": [
@@ -25,9 +25,38 @@ Create `config.json` like the following:
     "upgrades/**",
     "**.svg"
   ],
-  ``` 
+``` 
+
+Add on your github workflow:
+
+```
+steps:
+      - uses: actions/checkout@v2
+      - name: Check License and license year on prs
+        uses: ZupIT/header-license-checker@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          FORCE_COLOR: 3
+
+``` 
+
+
+If you don't want to ignore dot files on the analysis, use this configuration:
+
+```
+steps:
+      - uses: actions/checkout@v2
+      - name: Check License and license year on prs
+        uses: ZupIT/header-license-checker@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ignoreDotFiles: "false"
+          
+        env:
+          FORCE_COLOR: 3
+          
+
+``` 
 [Deno license checker]: https://github.com/kt3k/deno_license_checker
   
- 
- 
-```

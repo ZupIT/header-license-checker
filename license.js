@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
+ * Copyright 2021 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ const github = require('@actions/github')
 const fs = require("fs");
 const util = require("util");
 const chalk = require("chalk");
-function hasCorrectCopyrightDate(copyrightFile, file, startDateLicense) {
+function hasCorrectCopyrightDate(copyrightFile, startDateLicense) {
     const currentYear = new Date().getFullYear()
     let requiredDate = ''
     if (startDateLicense < currentYear) {
@@ -44,7 +44,7 @@ async function openFile(name) {
         })
 }
 
-async function checkLicenseFile(file, config, fd) {
+async function checkLicenseFile(fileName, config, fd) {
     let buffer = Buffer.alloc(8000)
     return await new Promise(
         (resolve, reject) => {
@@ -58,17 +58,17 @@ async function checkLicenseFile(file, config, fd) {
                 )
 
                 if (!allCopyrightIncluded) {
-                    console.log('File '+chalk.yellow(file.name+": ") + chalk.red('No copyright header!'))
-                    reject(file.name)
+                    console.log('File '+chalk.yellow(fileName+": ") + chalk.red('No copyright header!'))
+                    reject(fileName)
                 } else {
 
-                    const correctDate = hasCorrectCopyrightDate(copyrightFile, file, config.startDateLicense)
+                    const correctDate = hasCorrectCopyrightDate(copyrightFile, config.startDateLicense)
                     if (correctDate) {
-                        console.log('File ' + chalk.yellow(file.name+": ") + chalk.green('ok!'))
+                        console.log('File ' + chalk.yellow(fileName+": ") + chalk.green('ok!'))
                         resolve()
                     } else {
-                        console.log('File '+ chalk.yellow(file.name+": ")+ chalk.red('Fix copyright date!'))
-                        reject(file.name)
+                        console.log('File '+ chalk.yellow(fileName+": ")+ chalk.red('Fix copyright date!'))
+                        reject(fileName)
                     }
                 }
             })
@@ -78,7 +78,7 @@ async function checkLicenseFile(file, config, fd) {
 async function checkFilesLicense(filesPr, config) {
     let errors = []
     for ( let file of filesPr) {
-        const fd = await openFile(file.name)
+        const fd = await openFile(file)
         try{
             await checkLicenseFile(file, config, fd)
         } catch (error) {
@@ -94,28 +94,22 @@ async function checkFilesLicense(filesPr, config) {
 }
 
 function removeIgnoredFiles(filesPr, fileNames) {
-    return filesPr.filter(
-        file => fileNames.includes(file.name)
+    return filesPr.filter( filePr => {
+        const isIgnored = !fileNames.includes(filePr)
+        if (isIgnored) {
+            console.log('File: ' + chalk.yellow(filePr+": ") + chalk.green('ignored!'))
+            return false
+        }
+        return true
+    }
     )
-}
-
-async function getCreationYear(file, config) {
-    const response = await config.octokit.request(`GET /repos/{owner}/{repo}/commits?path=${file.name}`, {
-        owner: config.owner,
-        repo: config.repo
-    })
-    const commitsDates = response.data.map(
-        data => new Date(data.commit.author.date)
-    )
-    const creationDate = Math.min.apply(null, commitsDates)
-    return new Date(creationDate).getFullYear()
 }
 
 const checkLicense = async (fileNames, config) => {
-    const token = core.getInput('token')
+    const token = core.getInput('token') || process.env.TOKEN
 
     const octokit = github.getOctokit(token)
-    const prNumber = github.context.payload.pull_request. number
+    const prNumber = github.context.payload.pull_request.number
     const owner = github.context.payload.repository.owner.login
     const repo = github.context.payload.repository.name
      config = {
@@ -124,6 +118,7 @@ const checkLicense = async (fileNames, config) => {
         repo: repo,
        octokit: octokit
     }
+
     const responsePr = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', ({
         owner: config.owner,
         repo: config.repo,
@@ -135,23 +130,12 @@ const checkLicense = async (fileNames, config) => {
         repo: config.repo,
         basehead: `${responsePr.data.base.sha}...${responsePr.data.head.sha}`
     })
-    const filesPr = responseCompare.data.files.map(
-        file => {
-            return {
-                name: file.filename,
-                status: file.status
-            }
-        }
-    )
-    const filesFiltered = removeIgnoredFiles(filesPr, fileNames)
-    const filesWithYear = await Promise.all(filesFiltered.map(
-         async (file) => {
-            return {
-                ...file,
-                year :  await getCreationYear(file, config)
-            }
-        }))
-    return await checkFilesLicense(filesWithYear, config)
+
+    const prFilesName = responseCompare.data.files.map(it => {
+        return it.filename
+    })
+    const filesFiltered = removeIgnoredFiles(prFilesName, fileNames)
+    return await checkFilesLicense(filesFiltered, config)
 
 }
 

@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-const { checkLicense } = require("./licence");
+const { checkLicense } = require("./license");
 const core = require('@actions/core')
 const chalk = require('chalk')
 const { readFile, checkBOMInJSON } = require("./file");
@@ -28,13 +27,16 @@ if (fileData) {
     let copyrightContent = dataObject.copyright
     let ignore = dataObject.ignore
     let startDateLicense = dataObject.startDateLicense
+    let ignoreDotFiles = core.getInput("ignoreDotFiles") || "true"
     glob(
-        "**/*.*",{cwd: process.cwd(), ignore }, async (err,fileNames) => {
+        "**/*.*",{cwd: process.cwd(), ignore, dot: ignoreDotFiles === "false" }, async (err,fileNames) => {
             const error = await checkLicense(fileNames, { copyrightContent: copyrightContent, startDateLicense: startDateLicense })
-            if(error) {
+            if (error) {
                 console.log(chalk.red(error.title))
                 console.log(chalk.red(error.details))
                 core.setFailed('Action failed');
+            } else {
+                core.info('Action succeeded! Files with copyright updated');
             }
         }
     )
