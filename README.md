@@ -1,5 +1,5 @@
 # header-license-checker
-This action checks the license headers in the files of  pull requests.
+This action checks the license headers and license year in the files of  pull requests.
 Inspired on [Deno License Checker]
 
 # Usage
