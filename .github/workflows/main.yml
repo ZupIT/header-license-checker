@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Check License and date from prs files
-        uses: zupit/header-license-checker@5a298e502a93558685b014ee1177ef617aba5a39
+        uses: zupit/header-license-checker@${{ github.sha }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
