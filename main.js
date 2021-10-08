@@ -17,21 +17,25 @@
 const { checkLicense } = require("./licence");
 const core = require('@actions/core')
 const chalk = require('chalk')
+const { readFile, checkBOMInJSON } = require("./file");
 fs = require('fs');
 glob = require('glob')
 let file = "config.json"
-const data = fs.readFileSync(file, 'utf-8');
-let dataObject = JSON.parse(data)
-let copyrightContent = dataObject.copyright
-let ignore = dataObject.ignore
-let startDateLicense = dataObject.startDateLicense
-glob(
-    "**/*.*",{cwd: process.cwd(), ignore }, async (err,fileNames) => {
+const fileData = readFile(file)
+if (fileData) {
+    const fileFiltered = checkBOMInJSON(fileData)
+    let dataObject = JSON.parse(fileFiltered)
+    let copyrightContent = dataObject.copyright
+    let ignore = dataObject.ignore
+    let startDateLicense = dataObject.startDateLicense
+    glob(
+        "**/*.*",{cwd: process.cwd(), ignore }, async (err,fileNames) => {
             const error = await checkLicense(fileNames, { copyrightContent: copyrightContent, startDateLicense: startDateLicense })
             if(error) {
                 console.log(chalk.red(error.title))
                 console.log(chalk.red(error.details))
                 core.setFailed('Action failed');
             }
-    }
-)
+        }
+    )
+}
