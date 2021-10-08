@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require('loadenv')();
 const { checkLicense } = require("./license");
 const core = require('@actions/core')
 const chalk = require('chalk')
