@@ -20,7 +20,7 @@ inputs:
     required: true
   ignoreDotFiles:
     description: 'If dot files should be ignored'
-      required: false
+    required: false
 runs:
   using: 'node12'
   main: 'main.js'
