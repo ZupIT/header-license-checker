@@ -22,14 +22,11 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: get sha
-        shell: bash
-        id: sha_var
-        run: echo '::set-output name=sha::$(git rev-parse  HEAD)'
       - name: Check License and date from prs files
-        uses: zupit/header-license-checker@${{ steps.sha_var.outputs.sha }}
+        uses: zupit/header-license-checker@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ignoreDotFiles: "false"
         env:
           FORCE_COLOR: 3
 
