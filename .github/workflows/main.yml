@@ -26,7 +26,7 @@ jobs:
         uses: zupit/header-license-checker@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ignoreDotFiles: "false"
+          ignoreDotFiles: "true"
         env:
           FORCE_COLOR: 3
 
