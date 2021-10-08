@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const { checkLicense } = require("./licence");
+const { checkLicense } = require("./license");
 const core = require('@actions/core')
 const chalk = require('chalk')
 const { readFile, checkBOMInJSON } = require("./file");
