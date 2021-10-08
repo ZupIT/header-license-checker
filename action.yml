@@ -4,9 +4,9 @@ inputs:
   token:  # id da entrada
     description: 'Github token'
     required: true
-outputs:
-  time: # id da saída
-    description: 'The time we greeted you'
+  ignoreDotFiles:
+      description: 'Ignore dot files'
+      required: false
 runs:
   using: 'node12'
   main: 'main.js'

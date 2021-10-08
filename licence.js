@@ -94,8 +94,14 @@ async function checkFilesLicense(filesPr, config) {
 }
 
 function removeIgnoredFiles(filesPr, fileNames) {
-    return filesPr.filter(
-        file => fileNames.includes(file.name)
+    return filesPr.filter( filePr => {
+        const isIgnored = !fileNames.contains(filePr)
+        if (isIgnored) {
+            console.log('File: ' + chalk.yellow(filePr.name+": ") + chalk.green('ignored!'))
+            return false
+        }
+        return true
+    }
     )
 }
 
