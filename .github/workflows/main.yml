@@ -21,14 +21,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
       - name: get sha
         shell: bash
         id: sha_var
-        run:  |
-        echo "::set-output name=sha::$(git rev-parse  HEAD)"
-
-      - uses: actions/checkout@v2
-
+        run: echo '::set-output name=sha::$(git rev-parse  HEAD)'
       - name: Check License and date from prs files
         uses: zupit/header-license-checker@${{ steps.sha_var.outputs.sha }}
         with:
