@@ -51,7 +51,7 @@ steps:
         uses: ZupIT/header-license-checker@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ignoreDotFiles: "true"
+          ignoreDotFiles: "false"
           
         env:
           FORCE_COLOR: 3
