@@ -25,7 +25,7 @@ Create a `config.json` like the following:
     "upgrades/**",
     "**.svg"
   ],
-  ``` 
+``` 
 
 Add on your github workflow:
 
@@ -39,7 +39,7 @@ steps:
         env:
           FORCE_COLOR: 3
 
-  ``` 
+``` 
 
 
 If you don't want to ignore dot files on the analysis, use this configuration:
@@ -57,6 +57,6 @@ steps:
           FORCE_COLOR: 3
           
 
-  ``` 
+``` 
 [Deno license checker]: https://github.com/kt3k/deno_license_checker
   
