@@ -26,7 +26,7 @@ jobs:
       - name: Check License and date from prs files
         uses: zupit/header-license-checker@5a298e502a93558685b014ee1177ef617aba5a39
         with:
-          token: ${{ secrets.ACESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         env:
           FORCE_COLOR: 3
 
