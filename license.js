@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
+ * Copyright 2021, 2022 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,17 @@ const github = require('@actions/github')
 const fs = require("fs");
 const util = require("util");
 const chalk = require("chalk");
-function hasCorrectCopyrightDate(copyrightFile, startDateLicense) {
-    const currentYear = new Date().getFullYear()
-    let requiredDate = ''
-    if (startDateLicense < currentYear) {
-        requiredDate = `Copyright ${startDateLicense}, ${currentYear}`
-    } else {
-        requiredDate = `Copyright ${startDateLicense}`
-    }
 
-    return copyrightFile.includes(requiredDate)
+function getRequiredDateLicenseText(startDateLicense) {
+    const currentYear = new Date().getFullYear()
+    if (startDateLicense < currentYear) {
+        return  `Copyright ${startDateLicense}, ${currentYear}`
+    }
+    return `Copyright ${startDateLicense}`
+}
+function hasCorrectCopyrightDate(copyrightFile, startDateLicense) {
+    const  requiredDateText = getRequiredDateLicenseText(startDateLicense)
+    return copyrightFile.includes(requiredDateText)
 }
 
 async function openFile(name) {
@@ -44,6 +45,14 @@ async function openFile(name) {
         })
 }
 
+function checkLineOnFile(line, copyrightFile, fileName) {
+    if (!copyrightFile.includes(line)) {
+        console.log('File '+chalk.yellow(fileName+": ") + chalk.red(`Missing or Misspelling  the required text: "${line}" `))
+        return false
+    }
+    return true
+}
+
 async function checkLicenseFile(fileName, config, fd) {
     let buffer = Buffer.alloc(8000)
     return await new Promise(
@@ -54,11 +63,11 @@ async function checkLicenseFile(fileName, config, fd) {
                 }
                 const copyrightFile = buffer.toString('utf-8')
                 const allCopyrightIncluded = config.copyrightContent.every(
-                    line => copyrightFile.includes(line)
+                    line => checkLineOnFile(line, copyrightFile, fileName)
                 )
 
                 if (!allCopyrightIncluded) {
-                    console.log('File '+chalk.yellow(fileName+": ") + chalk.red('No copyright header!'))
+                    console.log('File '+chalk.yellow(fileName+": ") + chalk.red('Wrong license header!'))
                     reject(fileName)
                 } else {
 
@@ -67,7 +76,8 @@ async function checkLicenseFile(fileName, config, fd) {
                         console.log('File ' + chalk.yellow(fileName+": ") + chalk.green('ok!'))
                         resolve()
                     } else {
-                        console.log('File '+ chalk.yellow(fileName+": ")+ chalk.red('Fix copyright date!'))
+                        const requiredDateMessage = `Fix license header date! Expected "${getRequiredDateLicenseText(config.startDateLicense)}"`
+                        console.log('File '+ chalk.yellow(fileName+": ")+ chalk.red(requiredDateMessage))
                         reject(fileName)
                     }
                 }
@@ -107,7 +117,6 @@ function removeIgnoredFiles(filesPr, fileNames) {
 
 const checkLicense = async (fileNames, config) => {
     const token = core.getInput('token') || process.env.TOKEN
-
     const octokit = github.getOctokit(token)
     const prNumber = github.context.payload.pull_request.number
     const owner = github.context.payload.repository.owner.login
