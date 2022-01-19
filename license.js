@@ -67,7 +67,7 @@ async function checkLicenseFile(fileName, config, fd) {
                 )
 
                 if (!allCopyrightIncluded) {
-                    console.log('File '+chalk.yellow(fileName+": ") + chalk.red('Wrong copyright header!'))
+                    console.log('File '+chalk.yellow(fileName+": ") + chalk.red('Wrong license header!'))
                     reject(fileName)
                 } else {
 
