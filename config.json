@@ -12,6 +12,21 @@
     "See the License for the specific language governing permissions and",
     "limitations under the License."
   ],
-  "ignore": [],
-  "startDateLicense": 2022
+  "ignore": [
+    "node_modules/**",
+    "**.md",
+    "**.json",
+    ".png",
+    "**.idea",
+    ".github",
+    ".git",
+    ".gitignore",
+    ".vscode",
+    "dist/",
+    "coverage/**",
+    "upgrades/**",
+    ".storybook",
+    ".svg"
+  ],
+  "startDateLicense": 2021
 }
