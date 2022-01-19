@@ -15,7 +15,6 @@ function setTestInput(name, value) {
 
 describe('when checking license ',  () => {
     beforeEach(() => {
-        removeTestFile()
         nock('https://api.github.com')
             .get('/repos/test-org/test-repo/pulls/1')
             .reply(200, {
@@ -52,6 +51,9 @@ describe('when checking license ',  () => {
                     }
                 ]
             })
+    })
+    afterEach( () => {
+        removeTestFile()
     })
     it("should return error when license date of file it's outdated", async () => {
         const configJsonPath = createConfigJson()
