@@ -31,7 +31,24 @@ const checkBOMInJSON = (stringFile) => {
     }
     return stringFile
 }
-
-module.exports = {
-    readFile, checkBOMInJSON
+const readAndValidateConfigFile = (fileName) => {
+    const fileData = readFile(fileName)
+    if (!fileData) {
+        const errorMsg = `Missing ${fileName}`
+        core.setFailed(errorMsg)
+        throw new Error()
+    }
+    const fileFiltered = checkBOMInJSON(fileData)
+    let dataObject = JSON.parse(fileFiltered)
+    if (!dataObject.copyright || !dataObject.startDateLicense) {
+        const errorMsg = "Missing copyright or startDateLicense entry on config file. Check your config.json."
+        core.setFailed(errorMsg)
+        throw new Error()
+    }
+    return dataObject
 }
+module.exports = {
+    readFile, checkBOMInJSON, readAndValidateConfigFile
+}
+
+
